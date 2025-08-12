@@ -19,9 +19,6 @@ headers = {
 	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 }
 
-response = requests.get(ENGINEERING_URL, headers=headers)
-soup = BeautifulSoup(response.content, "html.parser")
-
 def scrap_url(url):
     print(f"Scrapping {url}...")
     response = requests.get(url, headers=headers)
@@ -41,11 +38,14 @@ def scrap_url(url):
         print("==============")
         print(f"JOB INFORMATION: {job_info}")
         
+def get_pages():
+    response = requests.get(ENGINEERING_URL, headers=headers)
+    soup = BeautifulSoup(response.content, "html.parser")
+    # 특정 태그로 정해져 있지 않을때 select로 특정 class명으로만 검색해서 해당 태그를 가져온다.
+    buttons_len = len(soup.select('[class*="page-numbers"]'))
+    return buttons_len - 1
 
-# 특정 태그로 정해져 있지 않을때 select로 특정 class명으로만 검색해서 해당 태그를 가져온다.
-buttons_len = len(soup.select('[class*="page-numbers"]'))
-
-for page in range(buttons_len - 1):
+for page in range(get_pages()):
     url = f"{ENGINEERING_URL}page/{page + 1}"
     scrap_url(url)
 
